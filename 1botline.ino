@@ -4,7 +4,6 @@ const int B_1B = 9;
 const int B_1A = 10;
 
 const int lineTrack = 2;
-bool firstRun = false;
 
 void setup() {
   Serial.begin(9600);
@@ -18,63 +17,74 @@ void setup() {
   pinMode(lineTrack, INPUT);
 }
 
+
 void loop() {
-  //if(firstRun) {
+
   int speed = 150;
 
   int lineColor = digitalRead(lineTrack); // 0:white  1:black
   Serial.println(lineColor); //print on the serial monitor
   if (lineColor) {
-    while (lineColor) {
-    moveForward(speed);
-    lineColor = digitalRead(lineTrack); // 0:white  1:black
-  Serial.println(lineColor); //print on the serial monitor
-    }
+    moveForward(150);
   } else {
-    bool directionLeft = checkLeft(lineColor, speed);
-    bool directionRight = checkRight(lineColor, speed);
-    if (directionLeft) {
-      moveLeft(speed);
-    } else if (directionRight) {
-      moveRight(speed);
-    }
+    checkLeft(speed);
+    checkRight(speed);
   }
-  //firstRun = false;
-  //}
 }
-void moveForward(int speed) {
-  analogWrite(A_1B, 0);
-  analogWrite(A_1A, speed);
-  analogWrite(B_1B, speed);
-  analogWrite(B_1A, 0);
-}
-
-
 void moveLeft(int speed) {
-  analogWrite(A_1B, 0);
-  analogWrite(A_1A, speed);
-  analogWrite(B_1B, 0);
+  analogWrite(A_1B, speed);
+  analogWrite(A_1A, 0);
+  analogWrite(B_1B, speed);
   analogWrite(B_1A, 0);
 }
 
 void moveRight(int speed) {
   analogWrite(A_1B, 0);
-  analogWrite(A_1A, 0);
-  analogWrite(B_1B, speed);
-  analogWrite(B_1A, 0);
-}
-bool checkLeft(int lineColor, int speed) {
-  moveLeft(speed);
-  if (lineColor = 1) {
-    return true;
-  }
-  return false;
+  analogWrite(A_1A, speed);
+  analogWrite(B_1B, 0);
+  analogWrite(B_1A, speed);
 }
 
-bool checkRight(int lineColor, int speed) {
-  moveRight(speed);
-  if (lineColor = 1) {
-    return true;
+void moveForward(int speed) {
+  digitalWrite(A_1B, 0);
+    digitalWrite(A_1A, speed);
+    digitalWrite(B_1B, speed);
+    digitalWrite(B_1A, 0);
+}
+
+void moveBackward(int speed) {
+    digitalWrite(A_1B, speed);
+    digitalWrite(A_1A, 0);
+    digitalWrite(B_1B, 0);
+    digitalWrite(B_1A, speed);
+}
+
+void stop() {
+    digitalWrite(A_1B, 0);
+    digitalWrite(A_1A, 0);
+    digitalWrite(B_1B, 0);
+    digitalWrite(B_1A, 0);
+}
+void checkLeft(int speed) {
+  for (int i = 0; i < 180; i++) {
+    moveLeft(speed);
+    int lineColor = digitalRead(lineTrack); // 0:white  1:black
+    Serial.println(lineColor); //print on the serial monitor
+    if (lineColor) {
+      moveForward(speed);
+      return;
+    }
   }
-  return false;
+}
+void checkRight(int speed) {
+  for (int i = 0; i < 360; i++) {
+    moveRight(speed);
+    int lineColor = digitalRead(lineTrack); // 0:white  1:black
+    Serial.println(lineColor); //print on the serial monitor
+
+    if (lineColor) {
+      moveForward(speed);
+      return;
+    }
+  }
 }
