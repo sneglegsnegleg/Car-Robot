@@ -16,33 +16,45 @@ void setup() {
   //line track
   pinMode(lineTrack, INPUT);
 }
-
+int lastTurn = 1;
 
 void loop() {
 
-  int speed = 150;
+  int speed = 200;
 
   int lineColor = digitalRead(lineTrack); // 0:white  1:black
   Serial.println(lineColor); //print on the serial monitor
-  if (lineColor) {
-    moveForward(150);
+  if(lineColor) {
+    moveForward(speed);
+    delay(50);
   } else {
-    checkLeft(speed);
-    checkRight(speed);
+    int amount = 5;
+    while (!lineColor) {
+      checkLeft(speed, amount);
+      stop();
+      delay(75);
+      checkRight(speed, amount);
+      stop();
+      delay(75);
+      lineColor = digitalRead(lineTrack); // 0:white  1:black
+  Serial.println(lineColor); //print on the serial monitor
+      amount += 5;
+    }
   }
+  
 }
 void moveLeft(int speed) {
-  analogWrite(A_1B, speed);
-  analogWrite(A_1A, 0);
-  analogWrite(B_1B, speed);
-  analogWrite(B_1A, 0);
-}
-
-void moveRight(int speed) {
   analogWrite(A_1B, 0);
   analogWrite(A_1A, speed);
   analogWrite(B_1B, 0);
   analogWrite(B_1A, speed);
+}
+
+void moveRight(int speed) {
+  analogWrite(A_1B, speed);
+  analogWrite(A_1A, 0);
+  analogWrite(B_1B, speed);
+  analogWrite(B_1A, 0);
 }
 
 void moveForward(int speed) {
@@ -65,25 +77,25 @@ void stop() {
     digitalWrite(B_1B, 0);
     digitalWrite(B_1A, 0);
 }
-void checkLeft(int speed) {
-  for (int i = 0; i < 180; i++) {
+void checkLeft(int speed, int amount) {
+  for (int i = 0; i < amount; i++) {
     moveLeft(speed);
+    delay(25);
     int lineColor = digitalRead(lineTrack); // 0:white  1:black
     Serial.println(lineColor); //print on the serial monitor
     if (lineColor) {
-      moveForward(speed);
       return;
     }
   }
 }
-void checkRight(int speed) {
-  for (int i = 0; i < 360; i++) {
+void checkRight(int speed, int amount) {
+  for (int i = 0; i < amount * 2; i++) {
     moveRight(speed);
+    delay(25);
     int lineColor = digitalRead(lineTrack); // 0:white  1:black
     Serial.println(lineColor); //print on the serial monitor
 
     if (lineColor) {
-      moveForward(speed);
       return;
     }
   }
