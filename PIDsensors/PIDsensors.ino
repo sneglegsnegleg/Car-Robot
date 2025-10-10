@@ -7,8 +7,6 @@ const int lineTrackM = 2;
 const int lineTrackL = 12;
 const int lineTrackR = 11;
 
-bool firstRun = false;
-
 void setup() {
   Serial.begin(9600);
 
@@ -22,32 +20,38 @@ void setup() {
   pinMode(lineTrackL, INPUT);
   pinMode(lineTrackR, INPUT);
 }
+int d = 0;
 
 void loop() {
-  //if(firstRun) {
   int speed = 150;
 int lineColorL = digitalRead(lineTrackL);
 int lineColorR = digitalRead(lineTrackR);
 
-  int lineColor = digitalRead(lineTrackM); // 0:white  1:black
-  Serial.println(lineColor); //print on the serial monitor
-  if (lineColor) {
-    while (lineColor) {
+  int lineColorM = digitalRead(lineTrackM); // 0:white  1:black
+  Serial.println(lineColorM); //print on the serial monitor
+  if (lineColorL && lineColorR && lineColorM) {
     moveForward(speed);
-    lineColor = digitalRead(lineTrackM); // 0:white  1:black
-  Serial.println(lineColor); //print on the serial monitor
-    }
+    delay(d);
+  } else if (!lineColorL && !lineColorR && lineColorM) {
+    moveForward(speed);
+    delay(d);
+  } else if (!lineColorL && lineColorM && lineColorR) {
+    moveRight(speed, 0);
+    delay(d);
+  } else if (!lineColorL && !lineColorM && lineColorR) {
+    moveRight(speed, speed);
+    delay(d);
+  } else if (lineColorL && lineColorM && !lineColorR) {
+    moveLeft(speed, 0);
+    delay(d);
+  } else if (lineColorL && !lineColorM && !lineColorR) {
+    moveLeft(speed, speed);
+    delay(d);
   } else {
-    bool directionLeft = checkLeft(lineColorL, speed);
-    bool directionRight = checkRight(lineColorR, speed);
-    if (directionLeft) {
-      moveLeft(speed);
-    } else if (directionRight) {
-      moveRight(speed);
-    }
+    moveForward(speed);
+    delay(d);
   }
-  //firstRun = false;
-  //}
+  
 }
 void moveForward(int speed) {
   analogWrite(A_1B, 0);
@@ -55,19 +59,25 @@ void moveForward(int speed) {
   analogWrite(B_1B, speed);
   analogWrite(B_1A, 0);
 }
-
-
-void moveLeft(int speed) {
-  analogWrite(A_1B, 0);
-  analogWrite(A_1A, speed);
+void moveBackward(int speed) {
+  analogWrite(A_1B, speed);
+  analogWrite(A_1A, 0);
   analogWrite(B_1B, 0);
-  analogWrite(B_1A, 0);
+  analogWrite(B_1A, speed);
 }
 
-void moveRight(int speed) {
+
+void moveLeft(int speed1, int speed2) {
   analogWrite(A_1B, 0);
+  analogWrite(A_1A, speed1);
+  analogWrite(B_1B, 0);
+  analogWrite(B_1A, speed2);
+}
+
+void moveRight(int speed1, int speed2) {
+  analogWrite(A_1B, speed2);
   analogWrite(A_1A, 0);
-  analogWrite(B_1B, speed);
+  analogWrite(B_1B, speed1);
   analogWrite(B_1A, 0);
 }
 bool checkLeft(int lineColorL, int speed) {
