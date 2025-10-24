@@ -24,34 +24,32 @@ int d = 0;
 
 void loop() {
   int speed = 150;
-int lineColorL = digitalRead(lineTrackL);
-int lineColorR = digitalRead(lineTrackR);
+int lineColorL = analogRead(A1);
+int lineColorR = analogRead(A0);
 
   int lineColorM = digitalRead(lineTrackM); // 0:white  1:black
   Serial.println(lineColorM); //print on the serial monitor
-  if (lineColorL && lineColorR && lineColorM) {
+  if (lineColorM) {
     moveForward(speed);
-    delay(d);
-  } else if (!lineColorL && !lineColorR && lineColorM) {
+  } else if (lineColorR) {
+     moveRight(speed, speed);
+  } else if (lineColorL) {
+     moveLeft(speed, speed);
+  } else if (lineColorM && lineColorR && lineColorL){
     moveForward(speed);
-    delay(d);
-  } else if (!lineColorL && lineColorM && lineColorR) {
-    moveRight(speed, 0);
-    delay(d);
-  } else if (!lineColorL && !lineColorM && lineColorR) {
-    moveRight(speed, speed);
-    delay(d);
-  } else if (lineColorL && lineColorM && !lineColorR) {
+  } else if (lineColorM && lineColorR && !lineColorL) {
     moveLeft(speed, 0);
-    delay(d);
-  } else if (lineColorL && !lineColorM && !lineColorR) {
-    moveLeft(speed, speed);
-    delay(d);
+  } else if (lineColorM && !lineColorR && lineColorL) {
+    moveRight(speed, 0);
   } else {
-    moveForward(speed);
-    delay(d);
+    moveBackward(speed); 
   }
-  
+}
+void stop() {
+  analogWrite(A_1B, 0);
+  analogWrite(A_1A, 0);
+  analogWrite(B_1B, 0);
+  analogWrite(B_1A, 0);
 }
 void moveForward(int speed) {
   analogWrite(A_1B, 0);

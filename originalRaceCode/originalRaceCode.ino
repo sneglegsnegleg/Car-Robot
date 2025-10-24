@@ -26,7 +26,6 @@ void loop() {
   Serial.println(lineColor); //print on the serial monitor
   if(lineColor) {
     moveForward(speed);
-    delay(50);
   } else {
     int amount = 5;
     while (!lineColor) {
