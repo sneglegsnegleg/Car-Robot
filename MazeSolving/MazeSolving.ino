@@ -21,34 +21,53 @@ void setup() {
   pinMode(lineTrackR, INPUT);
 }
 int d = 0;
+int last = 0;
 
 void loop() {
   int speed = 150;
-int lineColorL  = analogRead(A0);
-int lineColorR = analogRead(A1);
+int L  = analogRead(A0);
+int R = analogRead(A1);
 
-  int lineColorM = digitalRead(lineTrackM); // 0:white  1:black
-  Serial.println(lineColorM); //print on the serial monitor
+  int M = digitalRead(lineTrackM); // 0:white  1:black
+  Serial.println(L); //print on the serial monitor
   //Serial.println(lineColorR); //print on the serial monitor
-  Serial.println(lineColorR); //print on the serial monitor
+  Serial.println(R); //print on the serial monitor
 delay(0);
-  if (lineColorM == 1 && lineColorR < 500 && lineColorL < 500) { //only middle sensor reads black
+  if ( M== 1 && R < 500 && R < 500) { //only middle sensor reads black
    moveForward(speed);
   } 
- else if (lineColorR > 500 && lineColorL < 500 && lineColorM == 0) { //only Right sensor reads black
-     moveRight(speed, 0);
-  } else if (lineColorL > 500 && lineColorR < 500 && lineColorM == 0) { //only Left sensor reads black
-     moveLeft(speed, 0);
+ else if (R > 500 && L < 500 && M == 0) { //only Right sensor reads black
+     moveRight(speed, speed);
+     last = 1;
+  } else if (L > 500 && R < 500 && M == 0) { //only Left sensor reads black
+     moveLeft(speed, speed);
+     last = 0;
   }
  else
-  if (lineColorM == 1 && lineColorR > 500 && lineColorL < 500) { //right and middle sensor read black
+  if (M == 1 && R > 500 && L < 500) { //right and middle sensor read black
     moveRight(speed, 0);
-  } else if (lineColorM == 1 && lineColorR < 500 && lineColorL > 500) { //left and middle sensor read black
+    last = 1;
+  } else if (M == 1 && R < 500 && L > 500) { //left and middle sensor read black
     moveLeft(speed, 0);
-  } else if (lineColorM == 1 && lineColorR > 500 && lineColorL > 500) { //all read black
+    last = 0;
+  } else if (M == 1 && R > 500 && L > 500) { //all read black
    moveForward(speed);
    }else {
-    //moveBackward(speed); 
+    if (last) {
+    while (!M && R < 500 && L < 500) {
+        moveRight(speed, speed);
+        M = digitalRead(lineTrackM);
+         L  = analogRead(A0);
+       R = analogRead(A1);
+    }
+    } else {
+      while (!M && R < 500 && L < 500) {
+        moveLeft(speed, speed);
+        M = digitalRead(lineTrackM);
+         L  = analogRead(A0);
+       R = analogRead(A1);
+    }
+    }
   }
 
 }
