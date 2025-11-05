@@ -39,19 +39,26 @@ delay(0);
  else if (R > 500 && L < 500 && M == 0) { //only Right sensor reads black
      moveRight(speed, speed);
      last = 1;
+  }else
+  if (M == 1 && R > 500 && L < 500) { //right and middle sensor read black
+    moveRight(speed, speed);
+    last = 1;
   } else if (L > 500 && R < 500 && M == 0) { //only Left sensor reads black
      moveLeft(speed, speed);
      last = 0;
-  }
- else
-  if (M == 1 && R > 500 && L < 500) { //right and middle sensor read black
-    moveRight(speed, 0);
-    last = 1;
   } else if (M == 1 && R < 500 && L > 500) { //left and middle sensor read black
-    moveLeft(speed, 0);
+    moveLeft(speed, speed    );
     last = 0;
   } else if (M == 1 && R > 500 && L > 500) { //all read black
    moveForward(speed);
+   } else if (!M && R > 500 && L > 500) {
+    if (last) {
+      moveRight(speed, speed);
+      last = 1;
+    } else {
+      moveLeft(speed, speed);
+      last = 0;
+    }
    }else {
     if (last) {
     while (!M && R < 500 && L < 500) {
@@ -59,6 +66,8 @@ delay(0);
         M = digitalRead(lineTrackM);
          L  = analogRead(A0);
        R = analogRead(A1);
+       last = 1;
+       delay(d);
     }
     } else {
       while (!M && R < 500 && L < 500) {
@@ -66,6 +75,8 @@ delay(0);
         M = digitalRead(lineTrackM);
          L  = analogRead(A0);
        R = analogRead(A1);
+       last = 0;
+       delay(d);
     }
     }
   }
