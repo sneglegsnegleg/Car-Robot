@@ -20,7 +20,7 @@ void setup() {
   pinMode(lineTrackL, INPUT);
   pinMode(lineTrackR, INPUT);
 }
-int d = 0;
+int d = 25;
 int last = 0;
 
 void loop() {
@@ -37,27 +37,49 @@ delay(0);
    moveForward(speed);
   } 
  else if (R > 500 && L < 500 && M == 0) { //only Right sensor reads black
+ while (!M) {
+    M = digitalRead(lineTrackM);
      moveRight(speed, speed);
      last = 1;
+ }
   }else
   if (M == 1 && R > 500 && L < 500) { //right and middle sensor read black
+  while (R > 500) {
+    R = analogRead(A1);
     moveRight(speed, speed);
     last = 1;
+  }
   } else if (L > 500 && R < 500 && M == 0) { //only Left sensor reads black
+  while (!M) {
+    M = digitalRead(lineTrackM);
      moveLeft(speed, speed);
      last = 0;
+  }
   } else if (M == 1 && R < 500 && L > 500) { //left and middle sensor read black
-    moveLeft(speed, speed    );
-    last = 0;
+    while (L > 500) {
+       L  = analogRead(A0);
+      moveLeft(speed, speed);
+      last = 0;
+    }
   } else if (M == 1 && R > 500 && L > 500) { //all read black
    moveForward(speed);
    } else if (!M && R > 500 && L > 500) {
     if (last) {
-      moveRight(speed, speed);
-      last = 1;
+      while (!M) {
+        moveRight(speed, speed);
+        M = digitalRead(lineTrackM);
+         L  = analogRead(A0);
+       R = analogRead(A1);
+       last = 1;
+    }
     } else {
-      moveLeft(speed, speed);
-      last = 0;
+      while (!M) {
+        moveLeft(speed, speed);
+        M = digitalRead(lineTrackM);
+         L  = analogRead(A0);
+       R = analogRead(A1);
+       last = 0;
+    }
     }
    }else {
     if (last) {
@@ -67,7 +89,6 @@ delay(0);
          L  = analogRead(A0);
        R = analogRead(A1);
        last = 1;
-       delay(d);
     }
     } else {
       while (!M && R < 500 && L < 500) {
@@ -76,7 +97,6 @@ delay(0);
          L  = analogRead(A0);
        R = analogRead(A1);
        last = 0;
-       delay(d);
     }
     }
   }
